@@ -1,43 +1,76 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { useEmployee } from "../context/EmployeeContext";
 import { Link } from "react-router-dom";
 
 const EmployeeList = () => {
-  const { employeesData } = useEmployee();
+  const { employeesData, setEmployeesData } = useEmployee();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterDepartment, setFilterDepartment] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+
+  const handleDelete = (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this employee?"
+    );
+    if (!confirmDelete) return;
+
+    const updatedEmployees = employeesData.filter((emp) => emp.id !== id);
+    setEmployeesData(updatedEmployees);
+    localStorage.setItem("employees", JSON.stringify(updatedEmployees));
+  };
+
+  const filteredEmployees = employeesData.filter((emp) => {
+    const matchesSearch =
+      emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      emp.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesDepartment =
+      filterDepartment === "" || emp.department === filterDepartment;
+
+    const matchesStatus = filterStatus === "" || emp.status === filterStatus;
+
+    return matchesSearch && matchesDepartment && matchesStatus;
+  });
 
   return (
     <div className="p-6">
-      {/* Header Section */}
       <div className="flex flex-col md:flex-row md:justify-between items-center mb-6 gap-4">
         <h1 className="text-2xl md:text-3xl font-bold">List Of Employees</h1>
 
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          {/* Search Bar */}
           <input
             type="text"
             placeholder="Search by name or email"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
 
-          {/* Department Filter */}
-          <select className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <select
+            value={filterDepartment}
+            onChange={(e) => setFilterDepartment(e.target.value)}
+            className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
             <option value="">All Departments</option>
             <option value="HR">HR</option>
             <option value="Engineering">Engineering</option>
             <option value="Sales">Sales</option>
             <option value="Marketing">Marketing</option>
+            <option value="IT">IT</option>
           </select>
 
-          {/* Status Filter */}
-          <select className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
             <option value="">All Status</option>
             <option value="Active">Active</option>
             <option value="On Leave">On Leave</option>
             <option value="Inactive">Inactive</option>
           </select>
 
-          {/* Add Employee Button */}
-          <Link to="/add-employee" className="">
+          <Link to="/add-employee">
             <button className="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition">
               + Add Employee
             </button>
@@ -45,9 +78,8 @@ const EmployeeList = () => {
         </div>
       </div>
 
-      {/* Employee Cards */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {employeesData?.map((employee, index) => (
+        {filteredEmployees.map((employee, index) => (
           <div
             key={index}
             className="bg-white shadow-lg rounded-2xl p-5 flex flex-col items-center text-center 
@@ -70,7 +102,10 @@ const EmployeeList = () => {
                   View
                 </button>
               </Link>
-              <button className="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg shadow hover:bg-gray-300 transition">
+              <button
+                onClick={() => handleDelete(employee.id)}
+                className="px-4 py-2 bg-red-500 text-white text-sm rounded-lg shadow hover:bg-red-600 transition"
+              >
                 Delete
               </button>
             </div>

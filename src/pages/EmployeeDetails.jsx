@@ -6,9 +6,8 @@ import EditModal from "../components/EditModal";
 const EmployeeDetails = () => {
   const { id } = useParams();
   const { employeesData } = useEmployee();
-  const navigate = useNavigate();
   const [editModal, setEditModal] = useState(false);
-
+  const navigate = useNavigate();
   const employee = employeesData.find((emp) => emp.id === Number(id));
 
   if (!employee) {
@@ -60,7 +59,15 @@ const EmployeeDetails = () => {
         </div>
       </div>
 
-      <div className="flex justify-end mt-6">
+      <div className="flex justify-between mt-6">
+        {" "}
+        {/* changed to justify-between */}
+        <button
+          onClick={() => navigate("/employees")}
+          className="px-5 py-2 rounded-lg bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400"
+        >
+          Back
+        </button>
         <button
           onClick={() => setEditModal(true)}
           className="px-5 py-2 rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600"

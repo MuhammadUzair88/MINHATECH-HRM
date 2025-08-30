@@ -4,12 +4,23 @@ import { employees as defaultEmployees } from "../assets/assets";
 const EmployeeContext = createContext();
 
 export const EmployeeProvider = ({ children }) => {
-  const [employeesData, setEmployeesData] = useState(defaultEmployees);
+  const [employeesData, setEmployeesData] = useState([]);
 
   useEffect(() => {
-    const storedEmployees = JSON.parse(localStorage.getItem("employees")) || [];
-    setEmployeesData([...defaultEmployees, ...storedEmployees]);
+    const storedEmployees = JSON.parse(localStorage.getItem("employees"));
+    if (storedEmployees && storedEmployees.length > 0) {
+      setEmployeesData(storedEmployees);
+    } else {
+      localStorage.setItem("employees", JSON.stringify(defaultEmployees));
+      setEmployeesData(defaultEmployees);
+    }
   }, []);
+
+  useEffect(() => {
+    if (employeesData.length > 0) {
+      localStorage.setItem("employees", JSON.stringify(employeesData));
+    }
+  }, [employeesData]);
 
   return (
     <EmployeeContext.Provider value={{ employeesData, setEmployeesData }}>

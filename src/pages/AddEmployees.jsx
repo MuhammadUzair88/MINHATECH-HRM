@@ -149,14 +149,21 @@ const AddEmployees = () => {
       </div>
 
       <div>
-        <label className="block text-gray-600">Profile Image (URL)</label>
+        <label className="block text-gray-600">Profile Image</label>
         <input
-          type="text"
-          name="image"
-          value={formData.image}
-          onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                setFormData({ ...formData, image: reader.result });
+              };
+              reader.readAsDataURL(file); // convert image to Base64
+            }
+          }}
           className="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-500"
-          placeholder="Paste image URL"
         />
       </div>
 
